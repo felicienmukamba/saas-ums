@@ -3,7 +3,8 @@ from core import views
 app_name = "core"
 
 urlpatterns = [
-    path("", views.DashboardView.as_view(), name="dashboard"),
+    path("", views.LandingPageView.as_view(), name="landing"),
+    path("dashboard/", views.DashboardView.as_view(), name="dashboard"),
     
     # Quick Add endpoints for nested forms
     path("quick-add/year/", views.QuickAddAcademicYearView.as_view(), name="quick_add_year"),

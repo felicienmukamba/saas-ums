@@ -6,7 +6,7 @@
 
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-lg-10 col-xl-8">
+    <div class="col">
         <div class="card shadow-sm border-0">
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0 fw-bold">
@@ -267,7 +267,12 @@ function loadQuickAddForm(fieldName, fieldLabel) {
             'X-Requested-With': 'XMLHttpRequest',
         },
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.form_html) {
             modalContent.innerHTML = data.form_html;
@@ -302,6 +307,10 @@ function loadQuickAddForm(fieldName, fieldLabel) {
 
 function submitQuickAddForm(fieldName, endpoint) {
     const form = document.getElementById('quickAddForm');
+    if (!form) {
+        console.error('Quick add form not found');
+        return;
+    }
     const modalContent = document.getElementById('quickAddContent');
     const submitButton = form.querySelector('button[type="submit"]');
     
@@ -319,17 +328,29 @@ function submitQuickAddForm(fieldName, endpoint) {
             'X-Requested-With': 'XMLHttpRequest',
         },
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => Promise.reject(err));
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
-            // Ajouter la nouvelle option au select
-            const selectField = document.querySelector(`select[name="${fieldName}"]`);
+            // Ajouter la nouvelle option au select - chercher par plusieurs noms possibles
+            const selectField = document.querySelector(`select[name="${fieldName}"], select[name="year"], select[name="academic_year"], select[name="faculty"], select[name="department"], select[name="semester"]`);
             if (selectField) {
-                const option = document.createElement('option');
-                option.value = data.value;
-                option.textContent = data.name;
-                option.selected = true;
-                selectField.appendChild(option);
+                // Vérifier si l'option existe déjà
+                const optionValue = data.id || data.value;
+                const existingOption = Array.from(selectField.options).find(opt => opt.value == optionValue);
+                if (!existingOption) {
+                    const option = document.createElement('option');
+                    option.value = optionValue;
+                    option.textContent = data.name;
+                    option.selected = true;
+                    selectField.appendChild(option);
+                } else {
+                    existingOption.selected = true;
+                }
                 
                 // Déclencher l'événement change pour notifier les autres scripts
                 selectField.dispatchEvent(new Event('change', { bubbles: true }));

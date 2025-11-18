@@ -6,6 +6,7 @@ from django.urls import reverse_lazy
 from django.views.generic import View, TemplateView
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.core.files.storage import default_storage
 
 from ums.mixins import (
     BaseCreateView,
@@ -35,9 +36,7 @@ class AcademicAccessMixin:
 # ====================================================================
 # Demandes d'inscription (publiques)
 # ====================================================================
-
 class EnrollmentRequestCreateView(View):
-    """Vue publique pour créer une demande d'inscription (pas besoin de login)"""
     template_name = "enrollment/enrollment_request_form.html"
     form_class = CompleteEnrollmentForm
     
@@ -51,11 +50,22 @@ class EnrollmentRequestCreateView(View):
     def post(self, request):
         form = self.form_class(request.POST, request.FILES)
         if form.is_valid():
-            # Sérialiser les données pour la demande
-            # Assurez-vous que tous les champs sont correctement traités, 
-            # surtout pour les Pk des relations Many-to-one
+            
+            # --- STEP 1: Handle the Photo Upload ---
+            photo_path = None
+            uploaded_photo = form.cleaned_data.get('photo')
+            
+            if uploaded_photo:
+                # Define a path where the file will be saved in your media folder
+                # Example: "enrollment_photos/my_photo.jpg"
+                file_name = f"enrollment_photos/{uploaded_photo.name}"
+                
+                # Save the file to disk and get the path string
+                photo_path = default_storage.save(file_name, uploaded_photo)
+
+            # --- STEP 2: Prepare Data (Store the PATH, not the File) ---
             student_data = {
-                'photo': None,  # Géré séparément
+                'photo': photo_path,  # <--- Now this is a string (or None), which IS serializable
                 'first_name': form.cleaned_data['first_name'],
                 'middle_name': form.cleaned_data['middle_name'],
                 'last_name': form.cleaned_data['last_name'],
@@ -104,7 +114,6 @@ class EnrollmentRequestCreateView(View):
             }
             
             enrollment_data = {
-                # Utiliser .pk pour garantir que c'est une valeur sérialisable si le champ est un modèle
                 'year': form.cleaned_data['year'].pk,
                 'semester': form.cleaned_data['semester'].pk,
                 'faculty': form.cleaned_data['faculty'].pk,
@@ -118,16 +127,13 @@ class EnrollmentRequestCreateView(View):
                 'commitments_accepted': form.cleaned_data['commitments_accepted'],
             }
             
-            # Créer la demande
+            # --- STEP 3: Create the Request ---
+            # We no longer need the separate .save() block after this because 
+            # the photo path is already included in student_data above.
             request_obj = EnrollmentRequest.objects.create(
                 student_data=student_data,
                 enrollment_data=enrollment_data,
             )
-            
-            # Sauvegarder la photo si fournie
-            if form.cleaned_data.get('photo'):
-                request_obj.student_data['photo'] = form.cleaned_data['photo']
-                request_obj.save()
             
             messages.success(request, "Votre demande d'inscription a été soumise avec succès. Vous serez contacté une fois qu'elle sera traitée.")
             return redirect('enrollment:request_success', pk=request_obj.pk)
@@ -136,8 +142,6 @@ class EnrollmentRequestCreateView(View):
             "form": form,
             "page_title": "Demande d'inscription",
         })
-
-
 class EnrollmentRequestSuccessView(TemplateView):
     """Page de confirmation après soumission d'une demande"""
     template_name = "enrollment/enrollment_request_success.html"
