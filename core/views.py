@@ -1,4 +1,10 @@
+from django.http import JsonResponse
 from django.views.generic import TemplateView
+from django.views.decorators.http import require_http_methods
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.template.loader import render_to_string
+import json
 
 from ums.mixins import (
     BaseCreateView,
@@ -9,8 +15,12 @@ from ums.mixins import (
     RoleGroups,
     RolePermissionMixin,
 )
-from .forms import AcademicYearForm, DepartmentForm, FacultyForm, SemesterForm
-from .models import AcademicYear, Department, Faculty, Semester
+from core.forms import AcademicYearForm, DepartmentForm, FacultyForm, SemesterForm, PromotionForm
+from core.models import AcademicYear, Department, Faculty, Semester, Promotion
+
+
+class RectorateAccessMixin:
+    allowed_roles = RoleGroups.MANAGEMENT
 
 
 class DashboardView(RolePermissionMixin, TemplateView):
@@ -18,8 +28,153 @@ class DashboardView(RolePermissionMixin, TemplateView):
     allowed_roles = RoleGroups.ALL_STAFF
 
 
-class RectorateAccessMixin:
+# Quick Add Views for nested forms
+@method_decorator(csrf_exempt, name='dispatch')
+class QuickAddAcademicYearView(BaseCreateView, RolePermissionMixin):
+    model = AcademicYear
+    form_class = AcademicYearForm
     allowed_roles = RoleGroups.MANAGEMENT
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class()
+        form_html = render_to_string('core/quick_add_form.html', {
+            'form': form,
+            'field_name': 'year',
+            'model_name': 'Année académique'
+        }, request=request)
+        return JsonResponse({'form_html': form_html})
+
+    def form_valid(self, form):
+        instance = form.save()
+        return JsonResponse({
+            "success": True,
+            "id": instance.pk,
+            "name": str(instance),
+            "value": instance.pk,
+        })
+
+    def form_invalid(self, form):
+        form_html = render_to_string('core/quick_add_form.html', {
+            'form': form,
+            'field_name': 'year',
+            'model_name': 'Année académique'
+        }, request=self.request)
+        return JsonResponse({
+            "success": False,
+            "errors": form.errors,
+            "form_html": form_html,
+        }, status=400)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class QuickAddFacultyView(BaseCreateView, RolePermissionMixin):
+    model = Faculty
+    form_class = FacultyForm
+    allowed_roles = RoleGroups.MANAGEMENT
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class()
+        form_html = render_to_string('core/quick_add_form.html', {
+            'form': form,
+            'field_name': 'faculty',
+            'model_name': 'Faculté'
+        }, request=request)
+        return JsonResponse({'form_html': form_html})
+
+    def form_valid(self, form):
+        instance = form.save()
+        return JsonResponse({
+            "success": True,
+            "id": instance.pk,
+            "name": str(instance),
+            "value": instance.pk,
+        })
+
+    def form_invalid(self, form):
+        form_html = render_to_string('core/quick_add_form.html', {
+            'form': form,
+            'field_name': 'faculty',
+            'model_name': 'Faculté'
+        }, request=self.request)
+        return JsonResponse({
+            "success": False,
+            "errors": form.errors,
+            "form_html": form_html,
+        }, status=400)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class QuickAddDepartmentView(BaseCreateView, RolePermissionMixin):
+    model = Department
+    form_class = DepartmentForm
+    allowed_roles = RoleGroups.MANAGEMENT
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class()
+        form_html = render_to_string('core/quick_add_form.html', {
+            'form': form,
+            'field_name': 'department',
+            'model_name': 'Département'
+        }, request=request)
+        return JsonResponse({'form_html': form_html})
+
+    def form_valid(self, form):
+        instance = form.save()
+        return JsonResponse({
+            "success": True,
+            "id": instance.pk,
+            "name": str(instance),
+            "value": instance.pk,
+        })
+
+    def form_invalid(self, form):
+        form_html = render_to_string('core/quick_add_form.html', {
+            'form': form,
+            'field_name': 'department',
+            'model_name': 'Département'
+        }, request=self.request)
+        return JsonResponse({
+            "success": False,
+            "errors": form.errors,
+            "form_html": form_html,
+        }, status=400)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class QuickAddSemesterView(BaseCreateView, RolePermissionMixin):
+    model = Semester
+    form_class = SemesterForm
+    allowed_roles = RoleGroups.MANAGEMENT
+
+    def get(self, request, *args, **kwargs):
+        form = self.form_class()
+        form_html = render_to_string('core/quick_add_form.html', {
+            'form': form,
+            'field_name': 'semester',
+            'model_name': 'Semestre'
+        }, request=request)
+        return JsonResponse({'form_html': form_html})
+
+    def form_valid(self, form):
+        instance = form.save()
+        return JsonResponse({
+            "success": True,
+            "id": instance.pk,
+            "name": str(instance),
+            "value": instance.pk,
+        })
+
+    def form_invalid(self, form):
+        form_html = render_to_string('core/quick_add_form.html', {
+            'form': form,
+            'field_name': 'semester',
+            'model_name': 'Semestre'
+        }, request=self.request)
+        return JsonResponse({
+            "success": False,
+            "errors": form.errors,
+            "form_html": form_html,
+        }, status=400)
 
 
 class AcademicYearListView(RectorateAccessMixin, BaseListView):
@@ -152,3 +307,34 @@ class DepartmentUpdateView(RectorateAccessMixin, BaseUpdateView):
 class DepartmentDeleteView(RectorateAccessMixin, BaseDeleteView):
     model = Department
     success_url_name = "core:department_list"
+
+
+class PromotionListView(RectorateAccessMixin, BaseListView):
+    model = Promotion
+    list_display = ("name", "code", "department")
+    page_title = "Promotions"
+    create_url_name = "core:promotion_create"
+    detail_url_name = "core:promotion_detail"
+    update_url_name = "core:promotion_update"
+    delete_url_name = "core:promotion_delete"
+
+
+class PromotionCreateView(RectorateAccessMixin, BaseCreateView):
+    model = Promotion
+    form_class = PromotionForm
+    success_url_name = "core:promotion_list"
+    success_message = "Promotion créée."
+
+class PromotionDetailView(RectorateAccessMixin, BaseDetailView):
+    model = Promotion
+
+class PromotionUpdateView(RectorateAccessMixin, BaseUpdateView):
+    model = Promotion
+    success_url_name = "core:promotion_list"
+    success_message = "Promotion mise à jour."
+
+
+class PromotionDeleteView(RectorateAccessMixin, BaseDeleteView):
+    model = Promotion
+    success_url_name = "core:promotion_list"
+

@@ -1,36 +1,55 @@
-{% load core_tags students_tags courses_tags enrollment_tags payments_tags %}
-<section class="row g-3 mb-4">
-    <div class="col-md-6 col-xl-3">
+{% load core_tags students_tags courses_tags enrollment_tags fees_tags payments_tags expenses_tags grades_tags staff_tags assessments_tags users_tags %}
+<section class="row g-3 mb-4 fade-in-up">
+    <div class="col-md-3">
         <div class="card shadow-sm border-0 h-100">
-            <div class="card-body">
-                <p class="text-muted mb-1">Étudiants actifs</p>
-                <h4 class="mb-0 fw-semibold">{% total_students %}</h4>
+            <div class="card-body text-center p-4">
+                <div class="mb-3">
+                    <div class="bg-primary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <i class="bi bi-people-fill text-white" style="font-size: 1.5rem;"></i>
+                    </div>
+                </div>
+                <p class="text-muted mb-1 fw-semibold">Étudiants</p>
+                <h3 class="mb-0 text-primary fw-bold">{% total_students %}</h3>
             </div>
         </div>
     </div>
-    <div class="col-md-6 col-xl-3">
+    <div class="col-md-3">
         <div class="card shadow-sm border-0 h-100">
-            <div class="card-body">
-                <p class="text-muted mb-1">Cours référencés</p>
-                <h4 class="mb-0 fw-semibold">{% total_courses %}</h4>
+            <div class="card-body text-center p-4">
+                <div class="mb-3">
+                    <div class="bg-success bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <i class="bi bi-book-fill text-white" style="font-size: 1.5rem;"></i>
+                    </div>
+                </div>
+                <p class="text-muted mb-1 fw-semibold">Cours</p>
+                <h3 class="mb-0 text-success fw-bold">{% total_courses %}</h3>
             </div>
         </div>
     </div>
-    <div class="col-md-6 col-xl-3">
+    <div class="col-md-3">
         <div class="card shadow-sm border-0 h-100">
-            <div class="card-body">
-                <p class="text-muted mb-1">Inscriptions LMD</p>
-                <h4 class="mb-0 fw-semibold">{% total_enrollments %}</h4>
+            <div class="card-body text-center p-4">
+                <div class="mb-3">
+                    <div class="bg-info bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <i class="bi bi-clipboard-check-fill text-white" style="font-size: 1.5rem;"></i>
+                    </div>
+                </div>
+                <p class="text-muted mb-1 fw-semibold">Inscriptions</p>
+                <h3 class="mb-0 text-info fw-bold">{% total_enrollments %}</h3>
             </div>
         </div>
     </div>
-    <div class="col-md-6 col-xl-3">
+    <div class="col-md-3">
         <div class="card shadow-sm border-0 h-100">
-            <div class="card-body">
-                <p class="text-muted mb-1">Paiements (année civile)</p>
-                <h4 class="mb-0 fw-semibold">{{ payments_current_year|default_if_none:0 }}</h4>
+            <div class="card-body text-center p-4">
+                <div class="mb-3">
+                    <div class="bg-warning bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                        <i class="bi bi-cash-stack text-white" style="font-size: 1.5rem;"></i>
+                    </div>
+                </div>
+                <p class="text-muted mb-1 fw-semibold">Paiements (cette année)</p>
+                <h3 class="mb-0 text-warning fw-bold">{% payments_current_year %} $</h3>
             </div>
         </div>
     </div>
 </section>
-

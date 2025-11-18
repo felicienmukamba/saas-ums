@@ -9,3 +9,4 @@ register = template.Library()
 def total_enrollments():
     return Enrollment.objects.count()
 
+

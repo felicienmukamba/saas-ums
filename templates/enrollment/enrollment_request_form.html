@@ -1,0 +1,577 @@
+{% extends "base.html" %}
+{% load form_tags %}
+{% load static %}
+
+{% block title %}Demande d'inscription | UMS{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card shadow-sm border-0 fade-in-up">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0 fw-bold">
+                    <i class="bi bi-clipboard-plus me-2"></i>Demande d'inscription
+                </h4>
+                <p class="mb-0 mt-2 small">Remplissez tous les champs ci-dessous pour soumettre votre demande d'inscription</p>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data" id="enrollmentForm">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <!-- Navigation par onglets -->
+                    <ul class="nav nav-pills mb-4" id="formTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="student-tab" data-bs-toggle="tab" data-bs-target="#student" type="button" role="tab">
+                                <i class="bi bi-person me-1"></i>Étudiant
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="address-tab" data-bs-toggle="tab" data-bs-target="#address" type="button" role="tab">
+                                <i class="bi bi-geo-alt me-1"></i>Adresse
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab">
+                                <i class="bi bi-telephone me-1"></i>Contact
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="diploma-tab" data-bs-toggle="tab" data-bs-target="#diploma" type="button" role="tab">
+                                <i class="bi bi-mortarboard me-1"></i>Diplôme
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="parents-tab" data-bs-toggle="tab" data-bs-target="#parents" type="button" role="tab">
+                                <i class="bi bi-people me-1"></i>Parents
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="enrollment-tab" data-bs-toggle="tab" data-bs-target="#enrollment" type="button" role="tab">
+                                <i class="bi bi-book me-1"></i>Inscription
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="formTabsContent">
+                        <!-- Onglet: Données de l'étudiant -->
+                        <div class="tab-pane fade show active" id="student" role="tabpanel">
+                            <h5 class="mb-3 text-primary"><i class="bi bi-person-circle me-2"></i>Informations personnelles</h5>
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label for="{{ form.photo.id_for_label }}" class="form-label fw-semibold">Photo</label>
+                                    {{ form.photo|add_class:"form-control" }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="{{ form.first_name.id_for_label }}" class="form-label fw-semibold">Prénom <span class="text-danger">*</span></label>
+                                    {{ form.first_name|add_class:"form-control" }}
+                                    {% if form.first_name.errors %}
+                                        <div class="text-danger small">{{ form.first_name.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="{{ form.middle_name.id_for_label }}" class="form-label fw-semibold">Nom du milieu <span class="text-danger">*</span></label>
+                                    {{ form.middle_name|add_class:"form-control" }}
+                                    {% if form.middle_name.errors %}
+                                        <div class="text-danger small">{{ form.middle_name.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="{{ form.last_name.id_for_label }}" class="form-label fw-semibold">Nom <span class="text-danger">*</span></label>
+                                    {{ form.last_name|add_class:"form-control" }}
+                                    {% if form.last_name.errors %}
+                                        <div class="text-danger small">{{ form.last_name.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="{{ form.gender.id_for_label }}" class="form-label fw-semibold">Genre <span class="text-danger">*</span></label>
+                                    {{ form.gender|add_class:"form-select" }}
+                                    {% if form.gender.errors %}
+                                        <div class="text-danger small">{{ form.gender.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="{{ form.marital_status.id_for_label }}" class="form-label fw-semibold">État civil <span class="text-danger">*</span></label>
+                                    {{ form.marital_status|add_class:"form-control" }}
+                                    {% if form.marital_status.errors %}
+                                        <div class="text-danger small">{{ form.marital_status.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="{{ form.birth_place.id_for_label }}" class="form-label fw-semibold">Lieu de naissance <span class="text-danger">*</span></label>
+                                    {{ form.birth_place|add_class:"form-control" }}
+                                    {% if form.birth_place.errors %}
+                                        <div class="text-danger small">{{ form.birth_place.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="{{ form.birth_date.id_for_label }}" class="form-label fw-semibold">Date de naissance <span class="text-danger">*</span></label>
+                                    {{ form.birth_date|add_class:"form-control" }}
+                                    {% if form.birth_date.errors %}
+                                        <div class="text-danger small">{{ form.birth_date.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="{{ form.nationality.id_for_label }}" class="form-label fw-semibold">Nationalité <span class="text-danger">*</span></label>
+                                    {{ form.nationality|add_class:"form-control" }}
+                                    {% if form.nationality.errors %}
+                                        <div class="text-danger small">{{ form.nationality.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Onglet: Adresse -->
+                        <div class="tab-pane fade" id="address" role="tabpanel">
+                            <h5 class="mb-3 text-primary"><i class="bi bi-geo-alt-fill me-2"></i>Adresse de résidence</h5>
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label for="{{ form.address_street.id_for_label }}" class="form-label fw-semibold">Rue <span class="text-danger">*</span></label>
+                                    {{ form.address_street|add_class:"form-control" }}
+                                    {% if form.address_street.errors %}
+                                        <div class="text-danger small">{{ form.address_street.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.address_quarter.id_for_label }}" class="form-label fw-semibold">Quartier <span class="text-danger">*</span></label>
+                                    {{ form.address_quarter|add_class:"form-control" }}
+                                    {% if form.address_quarter.errors %}
+                                        <div class="text-danger small">{{ form.address_quarter.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.address_city_commune.id_for_label }}" class="form-label fw-semibold">Ville/Commune <span class="text-danger">*</span></label>
+                                    {{ form.address_city_commune|add_class:"form-control" }}
+                                    {% if form.address_city_commune.errors %}
+                                        <div class="text-danger small">{{ form.address_city_commune.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Onglet: Contact -->
+                        <div class="tab-pane fade" id="contact" role="tabpanel">
+                            <h5 class="mb-3 text-primary"><i class="bi bi-telephone-fill me-2"></i>Coordonnées</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.contact_phone_number.id_for_label }}" class="form-label fw-semibold">Téléphone <span class="text-danger">*</span></label>
+                                    {{ form.contact_phone_number|add_class:"form-control" }}
+                                    {% if form.contact_phone_number.errors %}
+                                        <div class="text-danger small">{{ form.contact_phone_number.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.contact_whatsapp_number.id_for_label }}" class="form-label fw-semibold">WhatsApp (optionnel)</label>
+                                    {{ form.contact_whatsapp_number|add_class:"form-control" }}
+                                    {% if form.contact_whatsapp_number.errors %}
+                                        <div class="text-danger small">{{ form.contact_whatsapp_number.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-12">
+                                    <label for="{{ form.contact_email.id_for_label }}" class="form-label fw-semibold">Email <span class="text-danger">*</span></label>
+                                    {{ form.contact_email|add_class:"form-control" }}
+                                    {% if form.contact_email.errors %}
+                                        <div class="text-danger small">{{ form.contact_email.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Onglet: Diplôme -->
+                        <div class="tab-pane fade" id="diploma" role="tabpanel">
+                            <h5 class="mb-3 text-primary"><i class="bi bi-mortarboard-fill me-2"></i>Diplôme obtenu</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.diploma_institution.id_for_label }}" class="form-label fw-semibold">Institution <span class="text-danger">*</span></label>
+                                    {{ form.diploma_institution|add_class:"form-control" }}
+                                    {% if form.diploma_institution.errors %}
+                                        <div class="text-danger small">{{ form.diploma_institution.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="{{ form.diploma_obtaining_year.id_for_label }}" class="form-label fw-semibold">Année <span class="text-danger">*</span></label>
+                                    {{ form.diploma_obtaining_year|add_class:"form-control" }}
+                                    {% if form.diploma_obtaining_year.errors %}
+                                        <div class="text-danger small">{{ form.diploma_obtaining_year.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="{{ form.diploma_number.id_for_label }}" class="form-label fw-semibold">N° Diplôme <span class="text-danger">*</span></label>
+                                    {{ form.diploma_number|add_class:"form-control" }}
+                                    {% if form.diploma_number.errors %}
+                                        <div class="text-danger small">{{ form.diploma_number.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.diploma_section.id_for_label }}" class="form-label fw-semibold">Section <span class="text-danger">*</span></label>
+                                    {{ form.diploma_section|add_class:"form-control" }}
+                                    {% if form.diploma_section.errors %}
+                                        <div class="text-danger small">{{ form.diploma_section.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.diploma_percentage.id_for_label }}" class="form-label fw-semibold">Pourcentage <span class="text-danger">*</span></label>
+                                    {{ form.diploma_percentage|add_class:"form-control" }}
+                                    {% if form.diploma_percentage.errors %}
+                                        <div class="text-danger small">{{ form.diploma_percentage.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Onglet: Parents -->
+                        <div class="tab-pane fade" id="parents" role="tabpanel">
+                            <h5 class="mb-3 text-primary"><i class="bi bi-people-fill me-2"></i>Informations des parents</h5>
+                            
+                            <div class="card mb-4">
+                                <div class="card-header bg-info text-white">
+                                    <h6 class="mb-0"><i class="bi bi-gender-male me-2"></i>Père</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label for="{{ form.father_first_name.id_for_label }}" class="form-label fw-semibold">Prénom <span class="text-danger">*</span></label>
+                                            {{ form.father_first_name|add_class:"form-control" }}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="{{ form.father_middle_name.id_for_label }}" class="form-label fw-semibold">Nom du milieu <span class="text-danger">*</span></label>
+                                            {{ form.father_middle_name|add_class:"form-control" }}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="{{ form.father_last_name.id_for_label }}" class="form-label fw-semibold">Nom <span class="text-danger">*</span></label>
+                                            {{ form.father_last_name|add_class:"form-control" }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="{{ form.father_origin_country.id_for_label }}" class="form-label fw-semibold">Pays d'origine <span class="text-danger">*</span></label>
+                                            {{ form.father_origin_country|add_class:"form-control" }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="{{ form.father_province.id_for_label }}" class="form-label fw-semibold">Province <span class="text-danger">*</span></label>
+                                            {{ form.father_province|add_class:"form-control" }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="{{ form.father_address.id_for_label }}" class="form-label fw-semibold">Adresse <span class="text-danger">*</span></label>
+                                            {{ form.father_address|add_class:"form-control" }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label for="{{ form.father_phone_number.id_for_label }}" class="form-label fw-semibold">Téléphone <span class="text-danger">*</span></label>
+                                            {{ form.father_phone_number|add_class:"form-control" }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label for="{{ form.father_email.id_for_label }}" class="form-label fw-semibold">Email</label>
+                                            {{ form.father_email|add_class:"form-control" }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header bg-danger text-white">
+                                    <h6 class="mb-0"><i class="bi bi-gender-female me-2"></i>Mère</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label for="{{ form.mother_first_name.id_for_label }}" class="form-label fw-semibold">Prénom <span class="text-danger">*</span></label>
+                                            {{ form.mother_first_name|add_class:"form-control" }}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="{{ form.mother_middle_name.id_for_label }}" class="form-label fw-semibold">Nom du milieu <span class="text-danger">*</span></label>
+                                            {{ form.mother_middle_name|add_class:"form-control" }}
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="{{ form.mother_last_name.id_for_label }}" class="form-label fw-semibold">Nom <span class="text-danger">*</span></label>
+                                            {{ form.mother_last_name|add_class:"form-control" }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="{{ form.mother_origin_country.id_for_label }}" class="form-label fw-semibold">Pays d'origine <span class="text-danger">*</span></label>
+                                            {{ form.mother_origin_country|add_class:"form-control" }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="{{ form.mother_province.id_for_label }}" class="form-label fw-semibold">Province <span class="text-danger">*</span></label>
+                                            {{ form.mother_province|add_class:"form-control" }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="{{ form.mother_address.id_for_label }}" class="form-label fw-semibold">Adresse <span class="text-danger">*</span></label>
+                                            {{ form.mother_address|add_class:"form-control" }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label for="{{ form.mother_phone_number.id_for_label }}" class="form-label fw-semibold">Téléphone <span class="text-danger">*</span></label>
+                                            {{ form.mother_phone_number|add_class:"form-control" }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label for="{{ form.mother_email.id_for_label }}" class="form-label fw-semibold">Email</label>
+                                            {{ form.mother_email|add_class:"form-control" }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Onglet: Inscription -->
+                        <div class="tab-pane fade" id="enrollment" role="tabpanel">
+                            <h5 class="mb-3 text-primary"><i class="bi bi-book-fill me-2"></i>Informations d'inscription</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.year.id_for_label }}" class="form-label fw-semibold">Année académique <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        {{ form.year|add_class:"form-select" }}
+                                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#quickAddModal" onclick="loadQuickAddForm('year', 'Année académique')">
+                                            <i class="bi bi-plus-circle"></i>
+                                        </button>
+                                    </div>
+                                    {% if form.year.errors %}
+                                        <div class="text-danger small">{{ form.year.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.semester.id_for_label }}" class="form-label fw-semibold">Semestre <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        {{ form.semester|add_class:"form-select" }}
+                                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#quickAddModal" onclick="loadQuickAddForm('semester', 'Semestre')">
+                                            <i class="bi bi-plus-circle"></i>
+                                        </button>
+                                    </div>
+                                    {% if form.semester.errors %}
+                                        <div class="text-danger small">{{ form.semester.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.faculty.id_for_label }}" class="form-label fw-semibold">Faculté <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        {{ form.faculty|add_class:"form-select" }}
+                                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#quickAddModal" onclick="loadQuickAddForm('faculty', 'Faculté')">
+                                            <i class="bi bi-plus-circle"></i>
+                                        </button>
+                                    </div>
+                                    {% if form.faculty.errors %}
+                                        <div class="text-danger small">{{ form.faculty.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.department.id_for_label }}" class="form-label fw-semibold">Département</label>
+                                    <div class="input-group">
+                                        {{ form.department|add_class:"form-select" }}
+                                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#quickAddModal" onclick="loadQuickAddForm('department', 'Département')">
+                                            <i class="bi bi-plus-circle"></i>
+                                        </button>
+                                    </div>
+                                    {% if form.department.errors %}
+                                        <div class="text-danger small">{{ form.department.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-12">
+                                    <label for="{{ form.promotion.id_for_label }}" class="form-label fw-semibold">Promotion <span class="text-danger">*</span></label>
+                                    {{ form.promotion|add_class:"form-control" }}
+                                    {% if form.promotion.errors %}
+                                        <div class="text-danger small">{{ form.promotion.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-check form-switch">
+                                        {{ form.admission_exam|add_class:"form-check-input" }}
+                                        <label class="form-check-label" for="{{ form.admission_exam.id_for_label }}">
+                                            Avez-vous passé l'examen d'admission ?
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <label for="{{ form.how_known.id_for_label }}" class="form-label fw-semibold">Comment avez-vous connu notre université ? <span class="text-danger">*</span></label>
+                                    {{ form.how_known|add_class:"form-control" }}
+                                    {% if form.how_known.errors %}
+                                        <div class="text-danger small">{{ form.how_known.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-12">
+                                    <label for="{{ form.why_chosen.id_for_label }}" class="form-label fw-semibold">Pourquoi avez-vous choisi cette formation ? <span class="text-danger">*</span></label>
+                                    {{ form.why_chosen|add_class:"form-control" }}
+                                    {% if form.why_chosen.errors %}
+                                        <div class="text-danger small">{{ form.why_chosen.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-check form-switch">
+                                        {{ form.mutual_affiliate|add_class:"form-check-input" }}
+                                        <label class="form-check-label" for="{{ form.mutual_affiliate.id_for_label }}">
+                                            Êtes-vous affilié à une mutuelle ?
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-12" id="mutualDetails" style="display: none;">
+                                    <label for="{{ form.mutual_details.id_for_label }}" class="form-label fw-semibold">Détails de l'affiliation mutuelle</label>
+                                    {{ form.mutual_details|add_class:"form-control" }}
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-check">
+                                        {{ form.commitments_accepted|add_class:"form-check-input" }}
+                                        <label class="form-check-label fw-semibold" for="{{ form.commitments_accepted.id_for_label }}">
+                                            J'accepte les engagements et conditions d'inscription <span class="text-danger">*</span>
+                                        </label>
+                                    </div>
+                                    {% if form.commitments_accepted.errors %}
+                                        <div class="text-danger small">{{ form.commitments_accepted.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary" id="prevTab" style="display: none;">
+                            <i class="bi bi-arrow-left me-2"></i>Précédent
+                        </button>
+                        <div class="ms-auto">
+                            <button type="button" class="btn btn-outline-primary" id="nextTab">
+                                Suivant <i class="bi bi-arrow-right ms-2"></i>
+                            </button>
+                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" style="display: none;">
+                                <i class="bi bi-check-circle me-2"></i>Soumettre la demande
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modale pour création rapide -->
+<div class="modal fade" id="quickAddModal" tabindex="-1" aria-labelledby="quickAddModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="quickAddModalLabel">
+                    <i class="bi bi-plus-circle me-2"></i>Ajouter rapidement
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="quickAddContent">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <p class="text-muted mt-2">Chargement du formulaire...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tabs = document.querySelectorAll('#formTabs button[data-bs-toggle="tab"]');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+    const prevBtn = document.getElementById('prevTab');
+    const nextBtn = document.getElementById('nextTab');
+    const submitBtn = document.getElementById('submitBtn');
+    let currentTab = 0;
+    
+    const tabNames = ['student', 'address', 'contact', 'diploma', 'parents', 'enrollment'];
+    
+    function updateButtons() {
+        if (currentTab === 0) {
+            prevBtn.style.display = 'none';
+        } else {
+            prevBtn.style.display = 'block';
+        }
+        
+        if (currentTab === tabNames.length - 1) {
+            nextBtn.style.display = 'none';
+            submitBtn.style.display = 'block';
+        } else {
+            nextBtn.style.display = 'block';
+            submitBtn.style.display = 'none';
+        }
+    }
+    
+    nextBtn.addEventListener('click', function() {
+        if (currentTab < tabNames.length - 1) {
+            // Valider l'onglet actuel
+            const currentPane = document.getElementById(tabNames[currentTab]);
+            const inputs = currentPane.querySelectorAll('input[required], select[required], textarea[required]');
+            let isValid = true;
+            
+            inputs.forEach(input => {
+                if (!input.value) {
+                    isValid = false;
+                    input.classList.add('is-invalid');
+                } else {
+                    input.classList.remove('is-invalid');
+                }
+            });
+            
+            if (isValid) {
+                currentTab++;
+                const nextTab = new bootstrap.Tab(document.getElementById(`${tabNames[currentTab]}-tab`));
+                nextTab.show();
+                updateButtons();
+            } else {
+                alert('Veuillez remplir tous les champs obligatoires de cette section.');
+            }
+        }
+    });
+    
+    prevBtn.addEventListener('click', function() {
+        if (currentTab > 0) {
+            currentTab--;
+            const prevTab = new bootstrap.Tab(document.getElementById(`${tabNames[currentTab]}-tab`));
+            prevTab.show();
+            updateButtons();
+        }
+    });
+    
+    // Gérer le changement d'onglet manuel
+    tabs.forEach((tab, index) => {
+        tab.addEventListener('shown.bs.tab', function() {
+            currentTab = index;
+            updateButtons();
+        });
+    });
+    
+    // Gérer l'affichage des détails mutuelle
+    const mutualCheckbox = document.getElementById('{{ form.mutual_affiliate.id_for_label }}');
+    const mutualDetails = document.getElementById('mutualDetails');
+    if (mutualCheckbox) {
+        mutualCheckbox.addEventListener('change', function() {
+            mutualDetails.style.display = this.checked ? 'block' : 'none';
+        });
+    }
+    
+    // Charger les départements selon la faculté
+    const facultySelect = document.getElementById('{{ form.faculty.id_for_label }}');
+    const departmentSelect = document.getElementById('{{ form.department.id_for_label }}');
+    
+    if (facultySelect && departmentSelect) {
+        facultySelect.addEventListener('change', function() {
+            const facultyId = this.value;
+            if (facultyId) {
+                fetch(`/api/departments/?faculty=${facultyId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        departmentSelect.innerHTML = '<option value="">---------</option>';
+                        data.forEach(dept => {
+                            const option = document.createElement('option');
+                            option.value = dept.id;
+                            option.textContent = dept.name;
+                            departmentSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Error:', error));
+            } else {
+                departmentSelect.innerHTML = '<option value="">---------</option>';
+            }
+        });
+    }
+    
+    updateButtons();
+});
+</script>
+{% endblock %}
+

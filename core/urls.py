@@ -1,11 +1,16 @@
 from django.urls import path
-
-from . import views
-
+from core import views
 app_name = "core"
 
 urlpatterns = [
     path("", views.DashboardView.as_view(), name="dashboard"),
+    
+    # Quick Add endpoints for nested forms
+    path("quick-add/year/", views.QuickAddAcademicYearView.as_view(), name="quick_add_year"),
+    path("quick-add/faculty/", views.QuickAddFacultyView.as_view(), name="quick_add_faculty"),
+    path("quick-add/department/", views.QuickAddDepartmentView.as_view(), name="quick_add_department"),
+    path("quick-add/semester/", views.QuickAddSemesterView.as_view(), name="quick_add_semester"),
+    
     path("academic-years/", views.AcademicYearListView.as_view(), name="academic_year_list"),
     path("academic-years/create/", views.AcademicYearCreateView.as_view(), name="academic_year_create"),
     path("academic-years/<int:pk>/", views.AcademicYearDetailView.as_view(), name="academic_year_detail"),
@@ -26,5 +31,9 @@ urlpatterns = [
     path("departments/<int:pk>/", views.DepartmentDetailView.as_view(), name="department_detail"),
     path("departments/<int:pk>/update/", views.DepartmentUpdateView.as_view(), name="department_update"),
     path("departments/<int:pk>/delete/", views.DepartmentDeleteView.as_view(), name="department_delete"),
+    path("promotions/", views.PromotionListView.as_view(), name="promotion_list"),
+    path("promotions/create/", views.PromotionCreateView.as_view(), name="promotion_create"),
+    path("promotions/<int:pk>/", views.PromotionDetailView.as_view(), name="promotion_detail"),
+    path("promotions/<int:pk>/update/", views.PromotionUpdateView.as_view(), name="promotion_update"),
+    path("promotions/<int:pk>/delete/", views.PromotionDeleteView.as_view(), name="promotion_delete"),
 ]
-
