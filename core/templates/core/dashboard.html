@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load static %}
+{% load core_tags students_tags courses_tags enrollment_tags fees_tags payments_tags expenses_tags grades_tags staff_tags assessments_tags users_tags %}
 
 {% block title %}Tableau de bord | UMS{% endblock %}
 
@@ -7,19 +9,99 @@
 {% endblock %}
 
 {% block content %}
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-body">
-                    <h5 class="card-title">Bienvenue dans l'Université Management System</h5>
-                    <p class="card-text">
-                        Utilisez la barre latérale pour piloter les flux académiques, financiers et administratifs
-                        conformément au système LMD en RDC. Les processus sont sécurisés par rôle (rectorat,
-                        services académiques, finance, enseignants, etc.) afin de garantir la traçabilité des décisions.
-                    </p>
+<div class="row g-4">
+    <div class="col-12">
+        <div class="card shadow-sm border-0 fade-in-up">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0 fw-bold">
+                    <i class="bi bi-speedometer2 me-2"></i>Bienvenue dans l'Université Management System
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h4 class="text-primary mb-3">Système de Gestion Universitaire</h4>
+                        <p class="lead mb-4">
+                            Utilisez la barre de navigation pour gérer les entités académiques,
+                            financières et administratives. Les filtres et listes sont construits
+                            dynamiquement à partir des modèles pour limiter la duplication.
+                        </p>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="{% url 'students:student_list' %}" class="btn btn-primary">
+                                <i class="bi bi-people me-2"></i>Gérer les étudiants
+                            </a>
+                            <a href="{% url 'enrollment:enrollment_list' %}" class="btn btn-outline-primary">
+                                <i class="bi bi-clipboard-check me-2"></i>Voir les inscriptions
+                            </a>
+                            <a href="{% url 'courses:course_list' %}" class="btn btn-outline-primary">
+                                <i class="bi bi-book me-2"></i>Gérer les cours
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="bg-primary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 150px; height: 150px;">
+                            <i class="bi bi-mortarboard-fill text-white" style="font-size: 4rem;"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 fade-in-up">
+            <div class="card-header bg-success text-white">
+                <h6 class="mb-0 fw-bold">
+                    <i class="bi bi-graph-up-arrow me-2"></i>Statistiques rapides
+                </h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-3 d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-people text-primary me-2"></i>Total étudiants</span>
+                        <strong class="text-primary">{% total_students %}</strong>
+                    </li>
+                    <li class="mb-3 d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-book text-success me-2"></i>Total cours</span>
+                        <strong class="text-success">{% total_courses %}</strong>
+                    </li>
+                    <li class="mb-3 d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-clipboard-check text-info me-2"></i>Total inscriptions</span>
+                        <strong class="text-info">{% total_enrollments %}</strong>
+                    </li>
+                    <li class="d-flex justify-content-between align-items-center">
+                        <span><i class="bi bi-cash-stack text-warning me-2"></i>Paiements (année)</span>
+                        <strong class="text-warning">{% payments_current_year %} $</strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 fade-in-up">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0 fw-bold">
+                    <i class="bi bi-lightning-charge me-2"></i>Actions rapides
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'students:student_create' %}" class="btn btn-outline-primary">
+                        <i class="bi bi-person-plus me-2"></i>Nouvel étudiant
+                    </a>
+                    <a href="{% url 'enrollment:enrollment_create' %}" class="btn btn-outline-success">
+                        <i class="bi bi-clipboard-plus me-2"></i>Nouvelle inscription
+                    </a>
+                    <a href="{% url 'courses:course_create' %}" class="btn btn-outline-info">
+                        <i class="bi bi-book-half me-2"></i>Nouveau cours
+                    </a>
+                    <a href="{% url 'payments:payment_create' %}" class="btn btn-outline-warning">
+                        <i class="bi bi-cash-coin me-2"></i>Nouveau paiement
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
-

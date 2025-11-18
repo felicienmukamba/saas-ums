@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% load form_tags %}
+
+{% block title %}Détails de la demande | UMS{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 fade-in-up">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold">
+                    <i class="bi bi-clipboard-data me-2"></i>Détails de la demande d'inscription
+                </h5>
+                <span class="badge bg-{% if request.status == 'APPROVED' %}success{% elif request.status == 'REJECTED' %}danger{% else %}warning{% endif %}">
+                    {{ request.get_status_display }}
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <strong>Date de soumission :</strong><br>
+                        {{ request.submitted_at|date:"d/m/Y à H:i" }}
+                    </div>
+                    {% if request.reviewed_at %}
+                        <div class="col-md-6">
+                            <strong>Date de traitement :</strong><br>
+                            {{ request.reviewed_at|date:"d/m/Y à H:i" }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <hr>
+
+                <h6 class="text-primary mb-3"><i class="bi bi-person-circle me-2"></i>Informations de l'étudiant</h6>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Nom complet :</strong></div>
+                    <div class="col-md-8">
+                        {{ request.student_data.first_name }} {{ request.student_data.middle_name }} {{ request.student_data.last_name }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Genre :</strong></div>
+                    <div class="col-md-8">{{ request.student_data.gender }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Date de naissance :</strong></div>
+                    <div class="col-md-8">{{ request.student_data.birth_date }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Lieu de naissance :</strong></div>
+                    <div class="col-md-8">{{ request.student_data.birth_place }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Nationalité :</strong></div>
+                    <div class="col-md-8">{{ request.student_data.nationality }}</div>
+                </div>
+
+                <hr>
+
+                <h6 class="text-primary mb-3"><i class="bi bi-geo-alt me-2"></i>Adresse</h6>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        {{ request.student_data.address.street }}, {{ request.student_data.address.quarter }}, {{ request.student_data.address.city_commune }}
+                    </div>
+                </div>
+
+                <hr>
+
+                <h6 class="text-primary mb-3"><i class="bi bi-telephone me-2"></i>Contact</h6>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Téléphone :</strong></div>
+                    <div class="col-md-8">{{ request.student_data.contact.phone_number }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Email :</strong></div>
+                    <div class="col-md-8">{{ request.student_data.contact.email }}</div>
+                </div>
+
+                <hr>
+
+                <h6 class="text-primary mb-3"><i class="bi bi-book me-2"></i>Inscription demandée</h6>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Année académique :</strong></div>
+                    <div class="col-md-8">{{ request.enrollment_data.year|default:"-" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Promotion :</strong></div>
+                    <div class="col-md-8">{{ request.enrollment_data.promotion }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Comment connu :</strong></div>
+                    <div class="col-md-8">{{ request.enrollment_data.how_known }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4"><strong>Pourquoi choisi :</strong></div>
+                    <div class="col-md-8">{{ request.enrollment_data.why_chosen }}</div>
+                </div>
+
+                {% if request.review_notes %}
+                    <hr>
+                    <h6 class="text-primary mb-3"><i class="bi bi-chat-left-text me-2"></i>Notes du chargé</h6>
+                    <div class="alert alert-info">
+                        {{ request.review_notes }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        {% if request.status == 'PENDING' %}
+            <div class="card shadow-sm border-0 fade-in-up">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="mb-0 fw-bold"><i class="bi bi-exclamation-triangle me-2"></i>Actions</h6>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'enrollment:request_approve' request.pk %}" class="mb-3">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="approve_notes" class="form-label">Notes (optionnel)</label>
+                            <textarea name="notes" id="approve_notes" class="form-control" rows="3" placeholder="Notes additionnelles..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="bi bi-check-circle me-2"></i>Approuver la demande
+                        </button>
+                    </form>
+
+                    <form method="post" action="{% url 'enrollment:request_reject' request.pk %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="reject_notes" class="form-label">Raison du rejet</label>
+                            <textarea name="notes" id="reject_notes" class="form-control" rows="3" placeholder="Expliquez la raison du rejet..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100">
+                            <i class="bi bi-x-circle me-2"></i>Rejeter la demande
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if request.enrollment %}
+            <div class="card shadow-sm border-0 fade-in-up mt-3">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0 fw-bold"><i class="bi bi-link-45deg me-2"></i>Inscription créée</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>Inscription #{{ request.enrollment.pk }}</strong></p>
+                    <a href="{% url 'enrollment:enrollment_detail' request.enrollment.pk %}" class="btn btn-outline-primary btn-sm w-100">
+                        <i class="bi bi-eye me-1"></i>Voir l'inscription
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

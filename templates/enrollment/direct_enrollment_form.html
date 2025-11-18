@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load form_tags %}
+{% load static %}
+
+{% block title %}Inscrire un étudiant | UMS{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card shadow-sm border-0 fade-in-up">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0 fw-bold">
+                    <i class="bi bi-person-plus me-2"></i>Inscrire un étudiant
+                </h4>
+                <p class="mb-0 mt-2 small">Formulaire complet pour inscrire directement un étudiant</p>
+            </div>
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data" id="enrollmentForm">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <p class="text-muted mb-4">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Ce formulaire permet d'inscrire directement un étudiant. Tous les champs sont obligatoires.
+                    </p>
+                    
+                    <!-- Réutiliser les champs du formulaire de demande -->
+                    {% include "enrollment/enrollment_request_form.html" %}
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'enrollment:enrollment_list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Annuler
+                        </a>
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-check-circle me-2"></i>Inscrire l'étudiant
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,34 +1,441 @@
 {% extends "base.html" %}
+{% load form_tags %}
+{% load static %}
 
 {% block title %}{{ page_title }} | UMS{% endblock %}
 
 {% block content %}
-<div class="card shadow-sm">
-    <div class="card-header">
-        <h5 class="mb-0">{{ page_title }}</h5>
-    </div>
-    <div class="card-body">
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.non_field_errors }}
-            {% for field in form %}
-                <div class="mb-3">
-                    <label class="form-label">{{ field.label }}{% if field.field.required %} *{% endif %}</label>
-                    {{ field }}
-                    {% if field.help_text %}
-                        <small class="form-text text-muted">{{ field.help_text }}</small>
-                    {% endif %}
-                    {% for error in field.errors %}
-                        <div class="text-danger small">{{ error }}</div>
-                    {% endfor %}
-                </div>
-            {% endfor %}
-            <div class="d-flex justify-content-between">
-                <a class="btn btn-outline-secondary" href="javascript:history.back();">Annuler</a>
-                <button type="submit" class="btn btn-primary">Enregistrer</button>
+<div class="row justify-content-center">
+    <div class="col">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0 fw-bold">
+                    <i class="bi bi-{% if 'Créer' in page_title %}plus-circle{% else %}pencil-square{% endif %} me-2"></i>
+                    {{ page_title }}
+                </h5>
             </div>
-        </form>
+            <div class="card-body p-4">
+                <form method="post" enctype="multipart/form-data" id="mainForm" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            {{ form.non_field_errors }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endif %}
+
+                    <div class="row g-3">
+                        {% for field in form %}
+                            {% if field.field.widget.input_type == 'checkbox' %}
+                                <!-- Checkbox fields -->
+                                <div class="col-12">
+                                    <div class="form-check form-switch">
+                                        {{ field|add_class:"form-check-input" }}
+                                        <label class="form-check-label" for="{{ field.id_for_label }}">
+                                            {{ field.label }}
+                                            {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                                        </label>
+                                        {% if field.help_text %}
+                                            <small class="form-text text-muted d-block">{{ field.help_text }}</small>
+                                        {% endif %}
+                                        {% if field.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {% for error in field.errors %}
+                                                    <div><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% elif field.field.widget.input_type == 'textarea' or 'description' in field.name or 'notes' in field.name or 'why_chosen' in field.name or 'how_known' in field.name %}
+                                <!-- Textarea fields -->
+                                <div class="col-12">
+                                    <label for="{{ field.id_for_label }}" class="form-label fw-semibold">
+                                        {{ field.label }}
+                                        {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                                    </label>
+                                    {{ field|add_class:"form-control" }}
+                                    {% if field.help_text %}
+                                        <small class="form-text text-muted">
+                                            <i class="bi bi-info-circle me-1"></i>{{ field.help_text }}
+                                        </small>
+                                    {% endif %}
+                                    {% if field.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in field.errors %}
+                                                <div><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% elif field.field.widget.input_type == 'select' %}
+                                <!-- ForeignKey fields with quick add button -->
+                                <div class="col-md-6">
+                                    <label for="{{ field.id_for_label }}" class="form-label fw-semibold">
+                                        {{ field.label }}
+                                        {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                                    </label>
+                                    <div class="input-group">
+                                        {{ field|add_class:"form-select" }}
+                                        {% if field.name != 'user' %}
+                                            <button type="button" 
+                                                    class="btn btn-outline-primary" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#quickAddModal"
+                                                    title="Ajouter rapidement"
+                                                    onclick="loadQuickAddForm('{{ field.name }}', '{{ field.label }}')"
+                                                    data-field-name="{{ field.name }}">
+                                                <i class="bi bi-plus-circle"></i>
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                    {% if field.help_text %}
+                                        <small class="form-text text-muted">
+                                            <i class="bi bi-info-circle me-1"></i>{{ field.help_text }}
+                                        </small>
+                                    {% endif %}
+                                    {% if field.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in field.errors %}
+                                                <div><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <!-- Standard input fields -->
+                                <div class="col-md-6">
+                                    <label for="{{ field.id_for_label }}" class="form-label fw-semibold">
+                                        {{ field.label }}
+                                        {% if field.field.required %}<span class="text-danger">*</span>{% endif %}
+                                    </label>
+                                    {{ field|add_class:"form-control" }}
+                                    {% if field.help_text %}
+                                        <small class="form-text text-muted">
+                                            <i class="bi bi-info-circle me-1"></i>{{ field.help_text }}
+                                        </small>
+                                    {% endif %}
+                                    {% if field.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in field.errors %}
+                                                <div><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <!-- Datalists pour les suggestions -->
+                    <datalist id="marital_statuses">
+                        <option value="Célibataire">Célibataire</option>
+                        <option value="Marié(e)">Marié(e)</option>
+                        <option value="Divorcé(e)">Divorcé(e)</option>
+                        <option value="Veuf(ve)">Veuf(ve)</option>
+                    </datalist>
+
+                    <datalist id="sponsor_types">
+                        <option value="Organisation">Organisation</option>
+                        <option value="Entreprise">Entreprise</option>
+                        <option value="ONG">ONG</option>
+                        <option value="Gouvernement">Gouvernement</option>
+                        <option value="Particulier">Particulier</option>
+                    </datalist>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a class="btn btn-outline-secondary" href="javascript:history.back();">
+                            <i class="bi bi-arrow-left me-2"></i>Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-check-circle me-2"></i>Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modale générique pour création rapide des entités liées -->
+<div class="modal fade" id="quickAddModal" tabindex="-1" aria-labelledby="quickAddModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="quickAddModalLabel">
+                    <i class="bi bi-plus-circle me-2"></i>Ajouter rapidement
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="quickAddContent">
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <p class="text-muted mt-2">Chargement du formulaire...</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
 
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-focus sur le premier champ
+    const firstInput = document.querySelector('form input:not([type="hidden"]), form select, form textarea');
+    if (firstInput) {
+        firstInput.focus();
+    }
+    
+    // Validation Bootstrap
+    const form = document.getElementById('mainForm');
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    }
+
+    // Gestion de la modale de création rapide
+    const quickAddModal = document.getElementById('quickAddModal');
+    if (quickAddModal) {
+        quickAddModal.addEventListener('hidden.bs.modal', function() {
+            // Réinitialiser le contenu de la modale quand elle se ferme
+            document.getElementById('quickAddContent').innerHTML = `
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <p class="text-muted mt-2">Chargement du formulaire...</p>
+                </div>
+            `;
+        });
+    }
+});
+
+// Mapping des champs vers les endpoints
+const QUICK_ADD_ENDPOINTS = {
+    'year': '{% url "core:quick_add_year" %}',
+    'academic_year': '{% url "core:quick_add_year" %}',
+    'faculty': '{% url "core:quick_add_faculty" %}',
+    'department': '{% url "core:quick_add_department" %}',
+    'semester': '{% url "core:quick_add_semester" %}',
+};
+
+function loadQuickAddForm(fieldName, fieldLabel) {
+    const modal = document.getElementById('quickAddModal');
+    const modalLabel = document.getElementById('quickAddModalLabel');
+    const modalContent = document.getElementById('quickAddContent');
+    
+    // Normaliser le nom du champ
+    const normalizedFieldName = fieldName.toLowerCase().replace('_', '');
+    const endpoint = QUICK_ADD_ENDPOINTS[normalizedFieldName] || QUICK_ADD_ENDPOINTS[fieldName];
+    
+    if (!endpoint) {
+        modalContent.innerHTML = `
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                Fonctionnalité de création rapide non disponible pour ce champ.
+            </div>
+        `;
+        return;
+    }
+    
+    modalLabel.innerHTML = `<i class="bi bi-plus-circle me-2"></i>Ajouter ${fieldLabel}`;
+    modalContent.innerHTML = `
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Chargement...</span>
+            </div>
+            <p class="text-muted mt-2">Chargement du formulaire...</p>
+        </div>
+    `;
+    
+    // Charger le formulaire via AJAX
+    fetch(endpoint, {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.form_html) {
+            modalContent.innerHTML = data.form_html;
+            
+            // Ajouter l'événement de soumission du formulaire
+            const quickAddForm = document.getElementById('quickAddForm');
+            if (quickAddForm) {
+                quickAddForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    submitQuickAddForm(fieldName, endpoint);
+                });
+            }
+        } else {
+            modalContent.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Erreur lors du chargement du formulaire.
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        modalContent.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                Erreur lors du chargement du formulaire: ${error.message}
+            </div>
+        `;
+    });
+}
+
+function submitQuickAddForm(fieldName, endpoint) {
+    const form = document.getElementById('quickAddForm');
+    if (!form) {
+        console.error('Quick add form not found');
+        return;
+    }
+    const modalContent = document.getElementById('quickAddContent');
+    const submitButton = form.querySelector('button[type="submit"]');
+    
+    // Désactiver le bouton pendant la soumission
+    const originalButtonText = submitButton.innerHTML;
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Enregistrement...';
+    
+    const formData = new FormData(form);
+    
+    fetch(endpoint, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => Promise.reject(err));
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Ajouter la nouvelle option au select - chercher par plusieurs noms possibles
+            const selectField = document.querySelector(`select[name="${fieldName}"], select[name="year"], select[name="academic_year"], select[name="faculty"], select[name="department"], select[name="semester"]`);
+            if (selectField) {
+                // Vérifier si l'option existe déjà
+                const optionValue = data.id || data.value;
+                const existingOption = Array.from(selectField.options).find(opt => opt.value == optionValue);
+                if (!existingOption) {
+                    const option = document.createElement('option');
+                    option.value = optionValue;
+                    option.textContent = data.name;
+                    option.selected = true;
+                    selectField.appendChild(option);
+                } else {
+                    existingOption.selected = true;
+                }
+                
+                // Déclencher l'événement change pour notifier les autres scripts
+                selectField.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            
+            // Fermer la modale
+            const modal = bootstrap.Modal.getInstance(document.getElementById('quickAddModal'));
+            if (modal) {
+                modal.hide();
+            }
+            
+            // Afficher un message de succès
+            showNotification('success', `"${data.name}" a été ajouté avec succès !`);
+        } else {
+            // Afficher les erreurs
+            if (data.form_html) {
+                modalContent.innerHTML = data.form_html;
+                const quickAddForm = document.getElementById('quickAddForm');
+                if (quickAddForm) {
+                    quickAddForm.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        submitQuickAddForm(fieldName, endpoint);
+                    });
+                }
+            } else {
+                let errorHtml = '<div class="alert alert-danger"><ul class="mb-0">';
+                for (const [field, errors] of Object.entries(data.errors)) {
+                    errors.forEach(error => {
+                        errorHtml += `<li>${field}: ${error}</li>`;
+                    });
+                }
+                errorHtml += '</ul></div>';
+                modalContent.insertAdjacentHTML('afterbegin', errorHtml);
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        modalContent.insertAdjacentHTML('afterbegin', `
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                Erreur lors de l'enregistrement: ${error.message}
+            </div>
+        `);
+    })
+    .finally(() => {
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalButtonText;
+    });
+}
+
+function showNotification(type, message) {
+    // Créer une notification toast
+    const toastContainer = document.getElementById('toastContainer') || createToastContainer();
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+                ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    toastContainer.appendChild(toast);
+    
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+    
+    toast.addEventListener('hidden.bs.toast', function() {
+        toast.remove();
+    });
+}
+
+function createToastContainer() {
+    const container = document.createElement('div');
+    container.id = 'toastContainer';
+    container.className = 'toast-container position-fixed top-0 end-0 p-3';
+    container.style.zIndex = '9999';
+    document.body.appendChild(container);
+    return container;
+}
+</script>
+{% endblock %}

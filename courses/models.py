@@ -1,5 +1,5 @@
 from django.db import models
-from core.models import AcademicYear, Semester, Department
+from core.models import AcademicYear, Semester, Department, Promotion
 
 class Course(models.Model):
     course_name = models.CharField(max_length=150, unique=True)
@@ -22,7 +22,7 @@ class CourseOffering(models.Model):
     semester = models.ForeignKey(Semester, on_delete=models.CASCADE)
 
     department = models.ForeignKey(Department, on_delete=models.CASCADE)
-    promotion_name = models.CharField(max_length=100)
+    promotion = models.ForeignKey(Promotion, on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = ("course", "academic_year", "semester", "department", "promotion_name")
+        unique_together = ("course", "academic_year", "semester", "department", "promotion")

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Demande soumise | UMS{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 text-center fade-in-up">
+            <div class="card-body p-5">
+                <div class="mb-4">
+                    <div class="bg-success bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                        <i class="bi bi-check-circle-fill text-white" style="font-size: 3rem;"></i>
+                    </div>
+                </div>
+                <h3 class="text-success mb-3">Demande soumise avec succès !</h3>
+                <p class="lead mb-4">
+                    Votre demande d'inscription a été enregistrée et sera traitée par notre équipe.
+                </p>
+                {% if enrollment_request %}
+                    <div class="alert alert-info">
+                        <strong>Numéro de demande :</strong> #{{ enrollment_request.pk }}<br>
+                        <strong>Date de soumission :</strong> {{ enrollment_request.submitted_at|date:"d/m/Y à H:i" }}
+                    </div>
+                {% endif %}
+                <p class="text-muted mb-4">
+                    Vous recevrez un email de confirmation à l'adresse que vous avez fournie une fois que votre demande sera traitée.
+                </p>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                    <a href="{% url 'core:dashboard' %}" class="btn btn-primary">
+                        <i class="bi bi-house me-2"></i>Retour à l'accueil
+                    </a>
+                    <a href="{% url 'enrollment:request_create' %}" class="btn btn-outline-primary">
+                        <i class="bi bi-plus-circle me-2"></i>Nouvelle demande
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
