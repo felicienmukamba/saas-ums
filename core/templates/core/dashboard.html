@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de bord | UMS{% endblock %}
+
+{% block hero %}
+    {% include "partials/kpi_cards.html" %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title">Bienvenue dans l'Université Management System</h5>
+                    <p class="card-text">
+                        Utilisez la barre latérale pour piloter les flux académiques, financiers et administratifs
+                        conformément au système LMD en RDC. Les processus sont sécurisés par rôle (rectorat,
+                        services académiques, finance, enseignants, etc.) afin de garantir la traçabilité des décisions.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

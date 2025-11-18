@@ -81,7 +81,7 @@ ROOT_URLCONF = 'ums.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -114,6 +114,11 @@ DATABASES = {
 
 # Sets the custom user model for authentication
 AUTH_USER_MODEL = "users.User"
+
+# Login URLs
+LOGIN_URL = "users:login"
+LOGIN_REDIRECT_URL = "core:dashboard"
+LOGOUT_REDIRECT_URL = "users:login"
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},

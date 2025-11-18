@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} | UMS{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">{{ page_title }}</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    {% for label, value in fields %}
+                        <dt class="col-sm-4 text-muted">{{ label }}</dt>
+                        <dd class="col-sm-8 fw-semibold">{{ value|default:"-" }}</dd>
+                    {% endfor %}
+                </dl>
+            </div>
+        </div>
+    </div>
+    {% if extra_actions %}
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white">
+                    <h6 class="mb-0 text-uppercase text-muted">Actions métiers</h6>
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for action in extra_actions %}
+                        <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                           href="{{ action.url }}"
+                           {% if action.download %}download{% endif %}
+                           {% if action.target %}target="{{ action.target }}"{% endif %}>
+                            <span>{{ action.label }}</span>
+                            <span class="badge bg-primary-subtle text-primary">{{ action.badge|default:"PDF" }}</span>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
